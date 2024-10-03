@@ -15,4 +15,6 @@ int w = 1;
 bit TRUE = {val:1};
 bit FALSE = {val :0};
 
+int RC[24];
+
 #endif
