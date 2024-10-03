@@ -1,48 +1,43 @@
 #include "keccak.h"
 
-bit parite(int j, int k){
-    bit value = table[j * w + k];
-    for(int i = 1; i < 5; i++){
-        if(table[(i * 5 + j) * w + k].val != value.val){
-            return FALSE;
+
+void *round(void *A, uint64_t rc) {
+    // θ step
+    for(int x = 0; x < 5; x++){
+        C[x] = A[x,0] ^ A[x,1] ^ A[x,2] ^ A[x,3] ^ A[x,4];
+    }
+    for(int x = 0; x < 5; x++){
+        D[x] = C[x-1] ^ rot(C[x+1],1);
+    }
+    for(int x = 0; x < 5; x++){
+        for(int y = 0; y < 5; y++){
+            A[x,y] = A[x,y] ^ D[x];
         }
     }
-    return TRUE;
-}
 
-void theta(int i, int j){
-    for(int k = 0; k < w; k++){
-        table[(i * 5 + j) * w + k].val = table[(i * 5 + j) * w + k].val ^ parite(j - 1, k).val ^ parite(j + 1, k - 1).val;
-    }
-}
-
-void rho(int i, int j){
-    if(i == 0 && j == 0)
-        return;
-    for(int t = 0; t < 24; t++){
-        for(int k = 0; k < w; k++){
-            table[(i * 5 + j) * w + k].val = table[(i * 5 + j) * w + k - (t + 1) * (t + 2) / 2].val;
+    // ρ and π steps
+    for(int x = 0; x < 5; x++){
+        for(int y = 0; y < 5; y++){
+            B[y,2*x+3*y] = rot(A[x,y], r[x,y]);
         }
     }
-}
-
-
-void swap(bit *dest, bit *src){
-    for(int i = 0; i < w; i++){
-        dest[i].val = src[i].val;
+                    
+    // χ step
+    for(int x = 0; x < 5; x++){
+        for(int y = 0; y < 5; y++){
+            A[x,y] = B[x,y] ^ ((not B[x+1,y]) and B[x+2,y]),  for (x,y) in (0…4,0…4)
+        }
     }
+
+    // ι step
+    A[0,0] = A[0,0] ^ RC
+
+    return A
 }
 
-void pi(int i, int j){
-    swap(&table[((3 * i + 2 * j) * 5 + i) * w], &table[(i * 5 + j) * w]);
-}
-
-void chi(int i, int j){
-    for(int k = 0; k < w; k++){
-        table[(i * 5 + j) * w + k].val = table[(i * 5 + j) * w + k].val ^ !(table[(i * 5 + j + 1) * w + k].val) & (table[(i * 5 + j + 2) * w + k].val);z
+void *keccak_f(void *A) {
+    for(int i = 0; i < NB_ROUND; i++){
+        A = round(A, RC[i]);
     }
-}
-
-void iota(int i, int j){
-
+    return A;
 }
