@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-std=c99 -pedantic -Wall -Wextra -Wvla -Werror
-OBJ=sha3.o
-SRC=src/sha3.c
+OBJ=sha3.o keccak.o
+SRC=src/sha3.c src/keccak.c
 BIN=sha3
 
 all: $(BIN)
