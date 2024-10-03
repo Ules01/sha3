@@ -1,41 +1,46 @@
 #include "keccak.h"
 
 
-void *round(void *A, uint64_t rc) {
+
+uint64_t *round(uint64_t A[5][5], uint64_t rc) {
+    uint64_t B[5][5];
+    uint64_t C[5];
+    uint64_t D[5];
+    
     // θ step
     for(int x = 0; x < 5; x++){
-        C[x] = A[x,0] ^ A[x,1] ^ A[x,2] ^ A[x,3] ^ A[x,4];
+        C[x] = A[0][x] ^ A[1][x] ^ A[2][x] ^ A[3][x] ^ A[4][x];
     }
     for(int x = 0; x < 5; x++){
-        D[x] = C[x-1] ^ rot(C[x+1],1);
+        D[x] = C[x-1] ^ rot(C[x+1],1); //may go out of range
     }
-    for(int x = 0; x < 5; x++){
-        for(int y = 0; y < 5; y++){
-            A[x,y] = A[x,y] ^ D[x];
+    for(int y = 0; y < 5; y++){
+        for(int x = 0; x < 5; x++){
+            A[y][x] = A[y][x] ^ D[x];
         }
     }
 
     // ρ and π steps
-    for(int x = 0; x < 5; x++){
-        for(int y = 0; y < 5; y++){
-            B[y,2*x+3*y] = rot(A[x,y], r[x,y]);
+    for(int y = 0; y < 5; y++){
+        for(int x = 0; x < 5; x++){
+            B[2*x+3*y][y] = rot(A[y][x], r[y][x]);
         }
     }
                     
     // χ step
-    for(int x = 0; x < 5; x++){
-        for(int y = 0; y < 5; y++){
-            A[x,y] = B[x,y] ^ ((not B[x+1,y]) and B[x+2,y]),  for (x,y) in (0…4,0…4)
+    for(int y = 0; y < 5; y++){
+        for(int x = 0; x < 5; x++){
+            A[y][x] = B[y][x] ^ (!B[y][x+1] && B[y][x+2]);
         }
     }
 
     // ι step
-    A[0,0] = A[0,0] ^ RC
+    A[0][0] = A[0][0] ^ rc;
 
-    return A
+    return A;
 }
 
-void *keccak_f(void *A) {
+uint64_t *keccak_f(uint64_t A[5][5]) {
     for(int i = 0; i < NB_ROUND; i++){
         A = round(A, RC[i]);
     }
