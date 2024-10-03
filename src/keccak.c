@@ -41,7 +41,7 @@ uint64_t **keccak_round(uint64_t **A, uint64_t rc) {
         C[x] = A[0][x] ^ A[1][x] ^ A[2][x] ^ A[3][x] ^ A[4][x];
     }
     for(int x = 0; x < 5; x++){
-        D[x] = C[x-1] ^ rot(C[x+1],1); //may go out of range
+        D[x] = C[(x + 4) % 5] ^ rot(C[x+1],1); // (X + 4 )% 5 == (X - 1) % 5
     }
     for(int y = 0; y < 5; y++){
         for(int x = 0; x < 5; x++){
