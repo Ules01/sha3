@@ -1,5 +1,6 @@
 #include "keccak.h"
 
+
 const uint64_t RC[24] = {
     0x0000000000000001, 0x0000000000008082,
     0x800000000000808A, 0x8000000080008000,
@@ -74,4 +75,59 @@ uint64_t **keccak_f(uint64_t **A) {
         A = keccak_round(A, RC[i]);
     }
     return A;
+}
+
+uint64_t **init_matrice_sha3(){
+    //on alloue un tableau de 5 pointeurs, chacun va pointer sur une ligne de la matrice
+    //on alloue un tableau de 5 pointeurs, chacun va pointer sur une ligne de la matriceensuite pour chaque ligne on alloue un tab de 5 elements et on les initialise à 0
+
+    uint64_t **A = malloc(5 * sizeof(uint64_t *));
+    for(int i = 0; i < 5; i++){
+        A[i] = calloc(5, sizeof(uint64_t));
+    }
+    return A;
+}
+
+void destruction_matrice_sha3(uint64_t **A){
+     for(int i = 0; i < 5; i++){
+        free(A[i]);
+    }
+    free(A);
+
+}
+
+
+//rajoutons des bits suppementaires à la fin du message pour nous assurer que la longueur est un *rate
+void adding_padding(uint8_t *msg, size_t *msg_len, size_t rate) {
+    size_t x = *msg_len % rate; // combien d'octets dans le dernier bloc
+    size_t missing_octet = rate - x;
+    
+    //definir le debut du padding : Le premier octet du padding est défini par 0x06 (valeur standard pour Keccak).
+    msg[*msg_len] = 0x06;
+    memset(msg + *msg_len + 1, 0, missing_octet - 2);
+
+    //definir la fin du padding: Le dernier octet du padding est défini par 0x80.
+    msg[*msg_len + missing_octet - 1] = 0x80; 
+    *msg_len += missing_octet; 
+}
+
+
+void absorb(uint64_t **A, uint8_t *msg, size_t msg_len, size_t rate) {
+    for (size_t i = 0; i < msg; i += rate) {
+        for (size_t j = 0; j < rate; j++) {
+            ((uint8_t *)A)[j] ^= msg[i + j];
+        }
+        keccak_f(A);
+    }
+}
+
+void squeezing(uint64_t **A, uint8_t *res, size_t res_len, size_t rate) {
+    size_t extracted = 0;
+    while (extracted < res_len) {
+        memcpy(res + extracted, A, rate);
+        extracted += rate;
+        if (extracted < res_len) {
+            keccak_f(A);
+        }
+    }
 }
