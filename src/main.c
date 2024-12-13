@@ -1,5 +1,41 @@
 #include "sha3.h"
 
+sha3 SHA3_224 = {
+    .r = 1152,
+    .c = 448,
+    .length = 224,
+    .bits = 112,
+    .Mbits = 01,
+    .d = 0x06
+};
+
+sha3 SHA3_256 = {
+    .r = 1088,
+    .c = 512,
+    .length = 256,
+    .bits = 128,
+    .Mbits = 01,
+    .d = 0x06
+};
+
+sha3 SHA3_384 = {
+    .r = 832,
+    .c = 768,
+    .length = 384,
+    .bits = 192,
+    .Mbits = 01,
+    .d = 0x06
+};
+
+sha3 SHA3_512 = {
+    .r = 576,
+    .c = 1024,
+    .length = 512,
+    .bits = 256,
+    .Mbits = 01,
+    .d = 0x06
+};
+
 int main(int argc, char **argv){
 	sha3 *sha3 = NULL;
 	char *message = NULL;

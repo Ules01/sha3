@@ -17,61 +17,69 @@ const uint64_t RC[24] = {
 
 //Rotation table
 const int r[5][5] = {
-    {25, 39,  3, 10, 43},
-    {55, 20, 36, 44,  6},
-    {28, 27,  0,  1, 62},
-    {56, 14, 18,  2, 61},
-    {21,  8, 41, 45, 15}
+    {0, 1, 62, 28, 27},
+    {36, 44, 6, 55, 20},
+    {3, 10, 43, 25, 39},
+    {41, 45, 15, 21, 8},
+    {18, 2, 61, 56, 14}
 };
 
-uint64_t rot(uint64_t val, int n){
-    n = n % SIZE_BLOCK;
-    uint64_t right_side = val << n;               //first bits go to the last positions
-    uint64_t left_side = val >> (SIZE_BLOCK - n); //n last bits go to the first postions
-    return left_side | right_side;
-}
-
-uint64_t **keccak_round(uint64_t **A, uint64_t rc) {
+void keccak_round(uint64_t *A, uint64_t rc) {
+    
     uint64_t B[5][5];
-    uint64_t C[5];
-    uint64_t D[5];
+    uint64_t C[5] = {0, 0, 0, 0, 0};
+    uint64_t D[5] = {0, 0, 0, 0, 0};
+    
     
     // θ step
     for(int x = 0; x < 5; x++){
-        C[x] = A[0][x] ^ A[1][x] ^ A[2][x] ^ A[3][x] ^ A[4][x];
+        C[x] = A[x] ^ A[5 + x] ^ A[2 * 5 + x] ^ A[3 * 5 + x] ^ A[4 * 5 + x];
     }
     for(int x = 0; x < 5; x++){
-        D[x] = C[(x + 4) % 5] ^ rot(C[x+1],1); // (X + 4 )% 5 == (X - 1) % 5
-    }
-    for(int y = 0; y < 5; y++){
-        for(int x = 0; x < 5; x++){
-            A[y][x] = A[y][x] ^ D[x];
+        D[x] = C[(x + 4) % 5] ^ ROT(C[(x+1) % 5],1); // (X + 4 )% 5 == (X - 1) % 5
+
+        for(int y = 0; y < 5; y++){
+            A[y * 5 + x] = A[y * 5 + x] ^ D[x];
         }
     }
 
-    // ρ and π steps
+    // ρ step
     for(int y = 0; y < 5; y++){
         for(int x = 0; x < 5; x++){
-            B[2*x+3*y][y] = rot(A[y][x], r[y][x]);
+            B[y][x] = A[y * 5 + x];
+        }
+    }
+
+    // π step
+    for(int y = 0; y < 5; y++){
+        for(int x = 0; x < 5; x++){
+            A[y * 5 + x] = ROT(A[y * 5 + x], r[y][x]);
+        }
+    }
+    int u = 0;
+    int v = 0;
+    for (int y = 0; y < 5; ++y) {
+        for (int x = 0; x < 5; ++x) {
+            u = (0 * x + 1 * y) % 5;
+            v = (2 * x + 3 * y) % 5;
+            A[v * 5 + u] = B[y][x];
         }
     }
                     
     // χ step
     for(int y = 0; y < 5; y++){
         for(int x = 0; x < 5; x++){
-            A[y][x] = B[y][x] ^ (!B[y][x+1] && B[y][x+2]);
+            A[y * 5 + x] = B[y][x] ^ (!B[y][x+1] && B[y][x+2]);
         }
     }
-
+    
     // ι step
-    A[0][0] = A[0][0] ^ rc;
+    A[0] = A[0] ^ rc;
 
-    return A;
 }
 
-uint64_t **keccak_f(uint64_t **A) {
-    for(int i = 0; i < NB_ROUND; i++){
-        A = keccak_round(A, RC[i]);
+void keccak_f(uint64_t *A, int nr) {
+    for(int i = 0; i < nr; i++){
+        keccak_round(A, RC[i]);
     }
-    return A;
 }

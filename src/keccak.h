@@ -3,9 +3,9 @@
 
 #include <stdint.h>
 
-#define NB_ROUND 24
 #define SIZE_BLOCK 64
+#define ROT(x, y) (((x) << (y)) | ((x) >> (SIZE_BLOCK - (y))))
 
-uint64_t **keccak_f(uint64_t **A);
+void keccak_f(uint64_t *A, int nr);
 
 #endif
