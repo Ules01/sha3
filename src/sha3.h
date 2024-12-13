@@ -2,7 +2,6 @@
 #define SHA3_H
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "keccak.h"
@@ -54,5 +53,7 @@ sha3 SHA3_512 = {
     .Mbits = 01,
     .d = 0x06
 };
+
+void sha3_f(sha3 *sha3, char *input);
 
 #endif
