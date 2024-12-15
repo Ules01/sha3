@@ -36,6 +36,7 @@ sha3 SHA3_512 = {
     .d = 0x06
 };
 
+
 int main(int argc, char **argv){
 	sha3 *sha3 = NULL;
 	char *message = NULL;
@@ -83,3 +84,10 @@ int main(int argc, char **argv){
 	sha3_f(sha3, message);
 	return 0;
 }
+
+
+/*int main(void){
+    sha3_f(&SHA3_256, "");
+    sha3_f(&SHA3_256, "test");
+    return 0;
+}*/

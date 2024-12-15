@@ -1,12 +1,7 @@
 #ifndef SHA3_H
 #define SHA3_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "keccak.h"
-#include "utils.h"
 
 //Sha3 struct to hold sha3 values
 struct sha3_struct {
