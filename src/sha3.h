@@ -1,60 +1,24 @@
 #ifndef SHA3_H
 #define SHA3_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stdint.h>
+#include <stddef.h> // Pour size_t
 
-#include "keccak.h"
+void add_padding(uint8_t *block, size_t rate_bytes, size_t chunk_size);
 
-//Sha3 struct to hold sha3 values
-struct sha3_struct {
-    uint16_t r;
-    uint16_t c;
-    uint16_t length;
-    uint16_t bits;
-    uint8_t Mbits;
-    uint8_t d;
-};
+// Fonction générique pour la construction Sponge (interne)
+void sponge(const uint8_t *message, size_t message_len, uint8_t *output, size_t output_len, int r, int c);
 
-typedef struct sha3_struct sha3;
+// SHA3-224 : produit un hash de 224 bits
+void sha3_224(const uint8_t *message, size_t message_len, uint8_t *output);
 
-sha3 SHA3_224 = {
-    .r = 1152,
-    .c = 448,
-    .length = 224,
-    .bits = 112,
-    .Mbits = 01,
-    .d = 0x06
-};
+// SHA3-256 : produit un hash de 256 bits
+void sha3_256(const uint8_t *message, size_t message_len, uint8_t *output);
 
-sha3 SHA3_256 = {
-    .r = 1088,
-    .c = 512,
-    .length = 256,
-    .bits = 128,
-    .Mbits = 01,
-    .d = 0x06
-};
+// SHA3-384 : produit un hash de 384 bits
+void sha3_384(const uint8_t *message, size_t message_len, uint8_t *output);
 
-sha3 SHA3_384 = {
-    .r = 832,
-    .c = 768,
-    .length = 384,
-    .bits = 192,
-    .Mbits = 01,
-    .d = 0x06
-};
+// SHA3-512 : produit un hash de 512 bits
+void sha3_512(const uint8_t *message, size_t message_len, uint8_t *output);
 
-sha3 SHA3_512 = {
-    .r = 576,
-    .c = 1024,
-    .length = 512,
-    .bits = 256,
-    .Mbits = 01,
-    .d = 0x06
-};
-
-
-void sha3_compute(sha3 *sha3, uint8_t *message, size_t message_len, uint8_t *output);
-#endif
+#endif // SHA3_H
