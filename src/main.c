@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
 	}
 
      if(!message){
-        printf("Veuillez spécifier un message avec l'option message ou -m.\n");
+        printf("Veuillez spécifier un message (-m || message) ou un fichier (-f || file).\n");
         return 1;
     }
     

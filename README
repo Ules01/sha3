@@ -1,0 +1,25 @@
+NAME
+    sha3
+
+SYNOPSIS
+    sha3 TYPE (-f || file) FILENAME
+    sha3 TYPE (-m || message) MESSAGE
+
+DESCRIPTION
+    This sha3 implementation allow you to get the hash of a specific string or 
+    a file content according to SHA3-256, SHA3-384 or SHA3-512.
+
+TYPE
+    256, sha3-256
+        Set sha3 to the 256 mode.
+    384, sha3-384
+        Set sha3 to the 384 mode.
+    512, sha3-512
+        Set sha3 to the 512 mode.
+
+RETUEN VALUE
+    It return 1 on error 0 otherwise.
+
+AUTHORS
+    Emna Gharbi
+    Jules Leroquais
