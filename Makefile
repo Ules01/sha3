@@ -1,19 +1,23 @@
-CC=gcc
-CFLAGS=-std=c99 -pedantic -Wall -Wextra -Wvla -Werror
-OBJ=sha3.o keccak.o
-SRC=src/sha3.c src/keccak.c
-BIN=sha3
 
-all: $(BIN)
+CC = gcc
+CFLAGS = -std=c99 -pedantic -Wall -Wextra -Wvla -Werror
 
-$(BIN):$(OBJ)
 
-$(OBJ):
-	$(CC) $(CFLAGS) -c $(SRC)
-	
-debug:CFLAGS += -g
-debug:$(BIN)
-	
+SRCS = src/utils.c src/keccak.c src/sha3.c src/main.c
+OBJS = $(SRCS:.c=.o)
+TARGET = sha3
+
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
+
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 
 clean:
-	$(RM) $(OBJ) $(BIN)
+	rm -f $(OBJS) $(TARGET)
+

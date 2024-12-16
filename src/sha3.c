@@ -1,40 +1,71 @@
 #include "sha3.h"
 
-int main(int argc, char **argv){
-	sha3 *sha3 = NULL;
-	int i = 1;
 
-	//Check args
-	while(i < argc){
-		//Select sha3
-		if(!strcmp(argv[i], "sha3-224")){
-			sha3 = &SHA3_224;
-		}
-		if(!strcmp(argv[i], "sha3-256")){
-			sha3 = &SHA3_256;
-		}
-		if(!strcmp(argv[i], "sha3-384")){
-			sha3 = &SHA3_384;
-		}
-		if(!strcmp(argv[i], "sha3-512")){
-			sha3 = &SHA3_512;
-		}
+// Fonction pour ajouter le padding "10*1"
+void add_padding(uint8_t *block, size_t rate_bytes, size_t message_len) {
+    memset(block + message_len, 0, rate_bytes - message_len);   // Remplit avec des 0
+    block[message_len] = 0x06;                                  // Ajoute le "10" (0x06)
+    block[rate_bytes - 1] |= 0x80;                              // Dernier bit = 1
+}
 
-		i++;
-	}
+// Conversion de 64 bits little-endian
+static void store64(uint8_t *output, uint64_t value) {
+    for (int i = 0; i < 8; i++) {
+        output[i] = (uint8_t)(value >> (8 * i));
+    }
+}
 
-	//Check if a sha3 has been selected
-	if(!sha3){
-		printf("Sha3 list:\n");
-		printf("  * sha3-224\n");
-		printf("  * sha3-256\n");
-		printf("  * sha3-384\n");
-		printf("  * sha3-512\n");
-		return 1;
-	}
+static uint64_t load64(const uint8_t *input) {
+    uint64_t value = 0;
+    for (int i = 0; i < 8; i++) {
+        value |= ((uint64_t)input[i]) << (8 * i);
+    }
+    return value;
+}
 
-	//Start message
-	printf("Hello from the sha3 world!\n");
+void sponge(const uint8_t *message, size_t message_len, uint8_t *output, size_t output_len, int r) {
+    keccak_state state = {0};
+    
+    size_t rate_bytes = r / 8;
+    uint8_t *block = calloc(rate_bytes, sizeof(uint8_t));
+    size_t i;
 
-	return 0;
+    // Absorption
+    while (message_len >= rate_bytes) {
+        for (i = 0; i < rate_bytes / 8; i++) {
+            state[i % 5][i / 5] ^= load64(message + i * 8);
+        }
+        keccak_f(state);
+        message += rate_bytes;
+        message_len -= rate_bytes;
+    }
+
+    // Dernier bloc avec padding
+    memcpy(block, message, message_len);
+    add_padding(block, rate_bytes, message_len);
+
+    for (i = 0; i < rate_bytes / 8; i++) {
+        state[i % 5][i / 5] ^= load64(block + i * 8);
+    }
+    keccak_f(state);
+    free(block);
+
+    // Squeezing
+    while (output_len > 0) {
+        size_t chunk_size = (output_len < rate_bytes) ? output_len : rate_bytes;
+        for (i = 0; i < chunk_size / 8; i++) {
+            store64(output + i * 8, state[i % 5][i / 5]);
+        }
+        output += chunk_size;
+        output_len -= chunk_size;
+
+        if (output_len > 0) {
+            keccak_f(state);
+        }
+    }
+}
+
+void sha3_f(const uint8_t *message, size_t message_len, uint8_t *output, sha3 *sha3){
+	sponge(message, message_len, output, sha3->output_len, sha3->r);
+	print_hash(output, sha3->output_len);
 }
