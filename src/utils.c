@@ -15,7 +15,7 @@ int read_file_content(const char *filename, char **content) {
     FILE *file = fopen(filename, "r");
     if (file == NULL) {
         perror("Failed to open file");
-        return 1; // Error opening file
+        return 1;
     }
 
     fseek(file, 0, SEEK_END);

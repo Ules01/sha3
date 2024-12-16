@@ -74,9 +74,7 @@ void keccak_pi(keccak_state state) {
     // Réorganise les lanes selon la formule de pi
     for (int x = 0; x < 5; x++) {
         for (int y = 0; y < 5; y++) {
-            int newX = y;
-            int newY = (2 * x + 3 * y) % 5;
-            state[newX][newY] = temp[x][y];
+            state[y][(2 * x + 3 * y) % 5] = temp[x][y];
         }
     }
 }
@@ -108,10 +106,10 @@ void keccak_iota(keccak_state state, int round) {
 // Implémente la permutation Keccak-f[1600]
 void keccak_f(keccak_state state) {
     for (int round = 0; round < KECCAK_NUM_ROUNDS; round++) {
-        keccak_theta(state);  // Étape theta
-        keccak_rho(state);    // Étape rho
-        keccak_pi(state);     // Étape pi
-        keccak_chi(state);    // Étape chi
-        keccak_iota(state, round); // Étape iota
+        keccak_theta(state);        // Étape theta
+        keccak_rho(state);          // Étape rho
+        keccak_pi(state);           // Étape pi
+        keccak_chi(state);          // Étape chi
+        keccak_iota(state, round);  // Étape iota
     }
 }

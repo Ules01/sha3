@@ -3,9 +3,9 @@
 
 // Fonction pour ajouter le padding "10*1"
 void add_padding(uint8_t *block, size_t rate_bytes, size_t message_len) {
-    memset(block + message_len, 0, rate_bytes - message_len); // Remplit avec des 0
-    block[message_len] = 0x06;                               // Ajoute le "10" (0x06)
-    block[rate_bytes - 1] |= 0x80;                          // Dernier bit = 1
+    memset(block + message_len, 0, rate_bytes - message_len);   // Remplit avec des 0
+    block[message_len] = 0x06;                                  // Ajoute le "10" (0x06)
+    block[rate_bytes - 1] |= 0x80;                              // Dernier bit = 1
 }
 
 // Conversion de 64 bits little-endian
@@ -25,8 +25,9 @@ static uint64_t load64(const uint8_t *input) {
 
 void sponge(const uint8_t *message, size_t message_len, uint8_t *output, size_t output_len, int r) {
     keccak_state state = {0};
-    uint8_t block[200] = {0}; // Taille maximale pour 1600 bits
+    
     size_t rate_bytes = r / 8;
+    uint8_t *block = calloc(rate_bytes, sizeof(uint8_t));
     size_t i;
 
     // Absorption
@@ -40,7 +41,6 @@ void sponge(const uint8_t *message, size_t message_len, uint8_t *output, size_t 
     }
 
     // Dernier bloc avec padding
-    memset(block, 0, rate_bytes);
     memcpy(block, message, message_len);
     add_padding(block, rate_bytes, message_len);
 
@@ -48,6 +48,7 @@ void sponge(const uint8_t *message, size_t message_len, uint8_t *output, size_t 
         state[i % 5][i / 5] ^= load64(block + i * 8);
     }
     keccak_f(state);
+    free(block);
 
     // Squeezing
     while (output_len > 0) {
