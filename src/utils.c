@@ -12,7 +12,7 @@ void *convert(void *pt){
 }
 
 int read_file_content(const char *filename, char **content) {
-    FILE *file = fopen(filename, "r");
+    FILE *file = fopen(filename, "rb");
     if (file == NULL) {
         perror("Failed to open file");
         return 1;
