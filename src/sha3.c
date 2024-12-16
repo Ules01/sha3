@@ -1,7 +1,4 @@
-#include <string.h> // Pour memset et memcpy
-
 #include "sha3.h"
-#include "keccak.h"
 
 
 // Fonction pour ajouter le padding "10*1"
@@ -26,7 +23,7 @@ static uint64_t load64(const uint8_t *input) {
     return value;
 }
 
-void sponge(const uint8_t *message, size_t message_len, uint8_t *output, size_t output_len, int r, int c) {
+void sponge(const uint8_t *message, size_t message_len, uint8_t *output, size_t output_len, int r) {
     keccak_state state = {0};
     uint8_t block[200] = {0}; // Taille maximale pour 1600 bits
     size_t rate_bytes = r / 8;
@@ -66,18 +63,8 @@ void sponge(const uint8_t *message, size_t message_len, uint8_t *output, size_t 
         }
     }
 }
-void sha3_256(const uint8_t *message, size_t message_len, uint8_t *output) {
-    sponge(message, message_len, output, 256 / 8, 1088, 512); // r = 1088, c = 512
-}
 
-void sha3_224(const uint8_t *message, size_t message_len, uint8_t *output) {
-    sponge(message, message_len, output, 224 / 8, 1152, 448);
-}
-
-void sha3_384(const uint8_t *message, size_t message_len, uint8_t *output) {
-    sponge(message, message_len, output, 384 / 8, 832, 768);
-}
-
-void sha3_512(const uint8_t *message, size_t message_len, uint8_t *output) {
-    sponge(message, message_len, output, 512 / 8, 576, 1024);
+void sha3_f(const uint8_t *message, size_t message_len, uint8_t *output, sha3 *sha3){
+	sponge(message, message_len, output, sha3->output_len, sha3->r);
+	print_hash(output, sha3->output_len);
 }

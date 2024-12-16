@@ -3,9 +3,9 @@ CC = gcc
 CFLAGS = -Wall -Wextra -std=c99 -O2
 
 
-SRCS = src/keccak.c src/sha3.c src/main.c
+SRCS = src/utils.c src/keccak.c src/sha3.c src/main.c
 OBJS = $(SRCS:.c=.o)
-TARGET = keccak_test
+TARGET = sha3
 
 
 all: $(TARGET)
