@@ -15,7 +15,7 @@ int read_file_content(const char *filename, char **content) {
     FILE *file = fopen(filename, "rb");
     if (file == NULL) {
         perror("Failed to open file");
-        return 1;
+        return -1;
     }
 
     fseek(file, 0, SEEK_END);
@@ -23,7 +23,7 @@ int read_file_content(const char *filename, char **content) {
     if (file_size < 0) {
         perror("Failed to determine file size");
         fclose(file);
-        return 1;
+        return -1;
     }
     rewind(file);
 
@@ -34,10 +34,10 @@ int read_file_content(const char *filename, char **content) {
         free(*content);
         *content = NULL;
         fclose(file);
-        return 1;
+        return -1;
     }
 
     (*content)[file_size] = '\0';
     fclose(file);
-    return 0; // Success
+    return file_size;
 }

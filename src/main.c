@@ -23,6 +23,7 @@ int main(int argc, char **argv) {
     sha3 *sha3 = NULL;
     uint8_t *hash = NULL;
     char *message = NULL;
+    size_t message_len = 0;
     int free_m = 0;
     for(int i = 1; i < argc; i++){
         if(!strcmp(argv[i], "sha3-256") || !strcmp(argv[i], "256")){
@@ -40,11 +41,14 @@ int main(int argc, char **argv) {
             i++;
             if(argc - i){
                 message = argv[i];
+                message_len = strlen(argv[i]);
             }
         }
         if(!strcmp(argv[i], "-f") || !strcmp(argv[i], "file")){
             i++;
-            if(read_file_content(argv[i], &message)) return 1;
+            long int return_val = read_file_content(argv[i], &message);
+            if(return_val == -1) return 1;
+            message_len = return_val;
             free_m = 1;
         }
     }
@@ -63,7 +67,7 @@ int main(int argc, char **argv) {
     
     uint8_t *Mbytes = convert(message);
     hash = calloc(sha3->output_len, sizeof(uint8_t));
-    sha3_f(Mbytes, strlen(message), hash, sha3);
+    sha3_f(Mbytes, message_len, hash, sha3);
     free(hash);
     if(free_m) free(message);
     return 0;
