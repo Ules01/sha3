@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
     sha3 *sha3 = NULL;
     uint8_t *hash = NULL;
     char *message = NULL;
-
+    int free_m = 0;
     for(int i = 1; i < argc; i++){
         if(!strcmp(argv[i], "sha3-256") || !strcmp(argv[i], "256")){
             sha3 = &SHA3_256;
@@ -37,11 +37,16 @@ int main(int argc, char **argv) {
            sha3 = &SHA3_512;
         }
         if(!strcmp(argv[i], "-m") || !strcmp(argv[i], "message")){
-                i++;
-                if(argc - i){
-                    message = argv[i];
-                }
+            i++;
+            if(argc - i){
+                message = argv[i];
             }
+        }
+        if(!strcmp(argv[i], "-f") || !strcmp(argv[i], "file")){
+            i++;
+            if(read_file_content(argv[i], &message)) return 1;
+            free_m = 1;
+        }
     }
     if(!sha3){
 		printf("Aucun sha3 n'a ete selectionne. sha3 list:\n");
@@ -60,6 +65,7 @@ int main(int argc, char **argv) {
     hash = calloc(sha3->output_len, sizeof(uint8_t));
     sha3_f(Mbytes, strlen(message), hash, sha3);
     free(hash);
+    if(free_m) free(message);
     return 0;
 }
 

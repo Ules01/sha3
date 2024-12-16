@@ -15,5 +15,5 @@ typedef struct sha3_struct sha3;
 
 void print_hash(const uint8_t *hash, size_t len);
 void *convert(void *pt);
-
+int read_file_content(const char *filename, char **content);
 #endif // UTILS_H
