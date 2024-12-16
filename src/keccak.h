@@ -4,11 +4,11 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define KECCAK_WIDTH 1600 // La largeur totale de la mtarice, (25 * W)(notre lane)
-			  //
-#define KECCAK_LANE_SIZE 64 //tAILLE D'UNE LANE EN BITS  (lane est un sous-élément du "state". L'état est divisé en 25 lanes (matrice 5x5), et chaque lane contient w bits.
-			    //
-#define KECCAK_NUM_ROUNDS 24 // On applique 24 rounds pour Keccak-f[1600].
+#define KECCAK_WIDTH 1600       // La largeur totale de la mtarice, (25 * W)(notre lane)
+#define KECCAK_LANE_SIZE 64     //TAILLE D'UNE LANE EN BITS  (lane est un sous-élément du "state". L'état est divisé en 25 lanes (matrice 5x5), et chaque lane contient w bits.
+#define KECCAK_NUM_ROUNDS 24    // On applique 24 rounds pour Keccak-f[1600].
+
+#define ROT(x, y) (((x) << (y)) | ((x) >> (64 - (y))))
 
 typedef uint64_t keccak_state[5][5];
 

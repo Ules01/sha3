@@ -1,6 +1,6 @@
 
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c99 -O2
+CFLAGS = -std=c99 -pedantic -Wall -Wextra -Wvla -Werror
 
 
 SRCS = src/utils.c src/keccak.c src/sha3.c src/main.c
